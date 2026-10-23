@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – Schul-Organizer</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login-form">
+    <label>Benutzername oder E-Mail <input name="login" required></label><br>
+    <label>Passwort <input name="password" type="password" required></label><br>
+    <button type="submit">Einloggen</button>
+  </form>
+  <p id="message"></p>
+  <p>Noch kein Konto? <a href="register.html">Registrieren</a></p>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/auth/login', formToObject(e.target));
+        location.href = 'dashboard.html';
+      } catch (err) {
+        document.getElementById('message').textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

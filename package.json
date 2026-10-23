@@ -1,0 +1,26 @@
+{
+  "name": "schul-organizer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Schul-Organizer (SOG): Backend und Test-Frontend",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:init": "node db/init.js",
+    "db:seed": "node db/init.js --seed",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
