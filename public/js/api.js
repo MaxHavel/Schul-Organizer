@@ -1,9 +1,15 @@
+// Port vom Node-Server. Kommt die Seite von woanders (z. B. Live Server auf 5500),
+// gehen die Anfragen direkt an den Node-Server.
+const API_PORT = '3000';
+const API_BASE = location.port === API_PORT ? '' : `http://${location.hostname || 'localhost'}:${API_PORT}`;
+
 // Kleine Hilfsfunktion für API-Aufrufe. Wirft einen Fehler mit der Meldung vom Server.
 async function api(method, url, body) {
   let res;
   try {
-    res = await fetch(url, {
+    res = await fetch(API_BASE + url, {
       method,
+      credentials: 'include', // Login-Cookie auch über Live Server mitschicken
       headers: body ? { 'Content-Type': 'application/json' } : {},
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -17,8 +23,7 @@ async function api(method, url, body) {
   try {
     data = JSON.parse(text);
   } catch {
-    // Kein JSON: die Seite wurde wahrscheinlich nicht über den Node-Server geöffnet (z. B. Live Server)
-    throw new Error(`Unerwartete Antwort (${res.status}). Seite über http://localhost:3000 öffnen, nicht über Live Server.`);
+    throw new Error(`Unerwartete Antwort (${res.status}). Läuft "npm run dev" auf Port ${API_PORT}?`);
   }
   if (!res.ok) throw new Error(data.error || `Fehler ${res.status}`);
   return data;

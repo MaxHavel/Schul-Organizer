@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-# Schul-Organizer
-=======
 # Schul-Organizer (SOG)
 
 Web-App zur Schulorganisation: Aufgaben, Gruppen, Kalender und Punkte.
@@ -23,7 +20,8 @@ npm run dev                   # Server mit Auto-Reload, legt fehlende Tabellen a
 
 Dann <http://localhost:3000> öffnen und ein Konto registrieren. Konten bleiben gespeichert, auch nach einem Neustart.
 
-**Wichtig:** Die Seiten immer über `http://localhost:3000` öffnen, nicht über VS Code Live Server oder per Doppelklick auf die HTML-Datei. Sonst gibt es keine API und Registrieren/Login schlagen fehl.
+**VS Code Live Server** geht auch: `npm run dev` muss trotzdem laufen, dann `public/login.html` mit Live Server öffnen. Die Seite lädt bei jeder HTML/CSS-Änderung neu und schickt die API-Anfragen automatisch an Port 3000. Erlaubt sind standardmäßig `localhost:5500` und `127.0.0.1:5500`, andere Adressen in `.env` unter `CORS_ORIGINS` eintragen (mit Komma getrennt).
+Per Doppelklick auf die HTML-Datei (`file://`) funktioniert der Login nicht.
 
 Testdaten: `npm run db:reset` **löscht alle Daten** und legt die Test-User `anna`, `ben`, `cem` an (Passwort jeweils `passwort123`).
 
@@ -59,4 +57,3 @@ Der Benutzername ist gleichzeitig der Anzeigename und eindeutig (Groß/Klein ega
 | GET | `/api/auth/me` | – | `200 { user }` oder `401` |
 
 Weitere Endpunkte (Aufgaben, Gruppen, Termine, Punkte, Dashboard) folgen laut Plan.
->>>>>>> Stashed changes
