@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Schul-Organizer</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <p id="welcome">Lade...</p>
+  <button id="logout">Logout</button>
+  <h2>Eingeloggter User (Rohdaten)</h2>
+  <pre id="me"></pre>
+
+  <script src="js/api.js"></script>
+  <script>
+    api('GET', '/api/auth/me')
+      .then(({ user }) => {
+        document.getElementById('welcome').textContent = `Hallo ${user.username}!`;
+        document.getElementById('me').textContent = JSON.stringify(user, null, 2);
+      })
+      .catch(() => { location.href = 'login.html'; });
+
+    document.getElementById('logout').addEventListener('click', async () => {
+      await api('POST', '/api/auth/logout');
+      location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>

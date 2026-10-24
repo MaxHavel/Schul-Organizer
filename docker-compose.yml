@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: sog
+      POSTGRES_PASSWORD: sog
+      POSTGRES_DB: sog
+    ports:
+      - "5432:5432"
+    volumes:
+      - sog-data:/var/lib/postgresql/data
+      - ./db/docker:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  sog-data:
