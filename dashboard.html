@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Dashboard – Schul-Organizer</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Schul-Organizer</div>
+  <nav aria-label="Hauptnavigation">
+    <a href="dashboard.html" class="aktiv">Dashboard</a>
+    <a href="aufgaben.html" >Aufgaben</a>
+    <a href="kalender.html" >Kalender</a>
+    <a href="gruppen.html" >Gruppen</a>
+  </nav>
+  <div class="user">Angemeldet als<br><strong>Max Muster</strong><br><a href="login.html">Abmelden</a></div>
+</aside>
+<main>
+  <div class="kopf"><h1>Dashboard</h1><a class="btn" href="aufgaben.html">Neue Aufgabe</a></div>
+
+  <div class="grid drei">
+    <div class="card"><h2>Offen</h2><p class="punkte">0</p></div>
+    <div class="card"><h2>In Arbeit</h2><p class="punkte">0</p></div>
+    <div class="card"><h2>Meine Punkte</h2><p class="punkte">0</p><p class="klein">Für erledigte Aufgaben</p></div>
+  </div>
+
+  <section class="card">
+    <h2>Aufgaben nach Wichtigkeit und Dringlichkeit</h2>
+    <div class="matrix">
+      <div class="q1"><strong>Wichtig + dringend</strong><ul class="liste"><li>Beispielaufgabe <span class="badge">Mathe</span></li></ul></div>
+      <div class="q2"><strong>Wichtig, nicht dringend</strong></div>
+      <div class="q3"><strong>Dringend, nicht wichtig</strong></div>
+      <div class="q4"><strong>Weder noch</strong></div>
+    </div>
+  </section>
+
+  <div class="grid zwei">
+    <section class="card"><h2>Nächste Termine</h2>
+      <ul class="liste"><li>Test Englisch <span class="klein">Fr, 07.11.</span></li></ul></section>
+    <section class="card"><h2>Gruppenaufgaben</h2>
+      <ul class="liste"><li>Präsentation vorbereiten <span class="badge">Gruppe A</span></li></ul></section>
+  </div>
+</main></div></body></html>

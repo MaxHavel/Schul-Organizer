@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Aufgaben – Schul-Organizer</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Schul-Organizer</div>
+  <nav aria-label="Hauptnavigation">
+    <a href="dashboard.html" >Dashboard</a>
+    <a href="aufgaben.html" class="aktiv">Aufgaben</a>
+    <a href="kalender.html" >Kalender</a>
+    <a href="gruppen.html" >Gruppen</a>
+  </nav>
+  <div class="user">Angemeldet als<br><strong>Max Muster</strong><br><a href="login.html">Abmelden</a></div>
+</aside>
+<main>
+  <div class="kopf"><h1>Aufgaben</h1></div>
+  <div class="grid zwei">
+    <section class="card"><h2>Aufgabe anlegen</h2>
+      <form>
+        <label>Titel<input type="text" required></label>
+        <label>Beschreibung<textarea rows="3"></textarea></label>
+        <label>Fällig am<input type="date"></label>
+        <label>Wichtigkeit<select><option>Wichtig</option><option>Nicht wichtig</option></select></label>
+        <label>Dringlichkeit<select><option>Dringend</option><option>Nicht dringend</option></select></label>
+        <label>Für<select><option>Nur mich</option><option>Gruppe A</option></select></label>
+        <button class="btn" type="submit">Aufgabe speichern</button>
+      </form>
+    </section>
+    <section class="card"><h2>Alle Aufgaben</h2>
+      <table>
+        <thead><tr><th>Titel</th><th>Fällig</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Beispielaufgabe</td><td>10.11.</td><td><span class="badge">offen</span></td>
+              <td><button class="btn leer">Bearbeiten</button> <button class="btn leer">Löschen</button></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</main></div></body></html>

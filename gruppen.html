@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Gruppen – Schul-Organizer</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Schul-Organizer</div>
+  <nav aria-label="Hauptnavigation">
+    <a href="dashboard.html" >Dashboard</a>
+    <a href="aufgaben.html" >Aufgaben</a>
+    <a href="kalender.html" >Kalender</a>
+    <a href="gruppen.html" class="aktiv">Gruppen</a>
+  </nav>
+  <div class="user">Angemeldet als<br><strong>Max Muster</strong><br><a href="login.html">Abmelden</a></div>
+</aside>
+<main>
+  <div class="kopf"><h1>Gruppen</h1></div>
+  <div class="grid zwei">
+    <section class="card"><h2>Neue Gruppe bilden</h2>
+      <form>
+        <label>Gruppenname<input type="text" required></label>
+        <label>Mitschüler:innen auswählen
+          <select multiple size="5"><option>Anna K.</option><option>Ben S.</option><option>Clara M.</option></select></label>
+        <button class="btn" type="submit">Gruppe erstellen</button>
+      </form>
+    </section>
+    <section class="card"><h2>Meine Gruppen</h2>
+      <ul class="liste">
+        <li><span>Gruppe A <span class="klein">3 Mitglieder</span></span><a class="btn leer" href="aufgaben.html">Aufgabe eintragen</a></li>
+      </ul>
+    </section>
+  </div>
+</main></div></body></html>

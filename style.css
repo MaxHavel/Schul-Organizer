@@ -1,0 +1,71 @@
+/* Schul-Organizer (SOG) – Grundgerüst */
+:root{
+  --ink:#27303d; --muted:#6b7585; --paper:#f4f5f7; --card:#fff; --line:#dde1e7;
+  --accent:#2f7d6d; --accent-soft:#dff0eb;
+  --q1:#f3d6d2; --q2:#dfeaf5; --q3:#f6ecc9; --q4:#e7e9ed;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Layout: Sidebar + Inhalt */
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:var(--ink);color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:24px}
+.logo{font-weight:700;font-size:1.2rem;padding:0 8px}
+.sidebar nav{display:flex;flex-direction:column;gap:4px}
+.sidebar nav a{padding:10px 12px;border-radius:8px;color:#cfd6e0}
+.sidebar nav a:hover{background:rgba(255,255,255,.08)}
+.sidebar nav a.aktiv{background:var(--accent);color:#fff}
+.sidebar .user{margin-top:auto;font-size:.9rem;color:#cfd6e0;padding:0 8px}
+main{padding:28px 32px;display:flex;flex-direction:column;gap:24px;min-width:0}
+.kopf{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{font-size:1.6rem}
+h2{font-size:1.1rem;margin-bottom:12px}
+
+/* Bausteine */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.grid{display:grid;gap:16px}
+.grid.drei{grid-template-columns:repeat(3,1fr)}
+.grid.zwei{grid-template-columns:repeat(2,1fr)}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:inherit;cursor:pointer}
+.btn.leer{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.badge{display:inline-block;font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.punkte{font-size:2rem;font-weight:700}
+.klein{color:var(--muted);font-size:.9rem}
+ul.liste{list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.liste li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px}
+
+/* Wichtigkeit / Dringlichkeit (2x2) */
+.matrix{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.matrix > div{border-radius:var(--radius);padding:14px;min-height:130px}
+.q1{background:var(--q1)}.q2{background:var(--q2)}.q3{background:var(--q3)}.q4{background:var(--q4)}
+
+/* Formulare */
+form{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+input,select,textarea{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+
+/* Kalender */
+.kalender{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.kalender div{min-height:84px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;font-size:.85rem}
+.kalender .tag{background:transparent;border:0;min-height:0;font-weight:600;color:var(--muted)}
+
+/* Login */
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.login .card{width:100%;max-width:380px}
+
+/* Responsiv (Handy) */
+@media (max-width:800px){
+  .app{grid-template-columns:1fr}
+  .sidebar{flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px}
+  .sidebar nav{flex-direction:row;flex-wrap:wrap}
+  .sidebar .user{display:none}
+  main{padding:16px}
+  .grid.drei,.grid.zwei,.matrix{grid-template-columns:1fr}
+  .kalender{grid-template-columns:repeat(2,1fr)}
+  .kalender .tag{display:none}
+}
