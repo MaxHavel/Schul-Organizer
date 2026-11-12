@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchoolOrganizer AT - Cyber Academic Portal</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              bg: '#080C14',
+              panel: 'rgba(15, 23, 42, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    :root {
+      --spring-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --smooth-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      transition-timing-function: var(--smooth-ease);
+    }
+
+    .cyber-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .cyber-card {
+      background: rgba(20, 30, 52, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.3s var(--smooth-ease);
+    }
+
+    .cyber-card:hover {
+      transform: translateY(-3px) scale(1.015);
+      background: rgba(25, 38, 65, 0.7);
+      box-shadow: 0 12px 30px -8px rgba(6, 182, 212, 0.2);
+    }
+
+    .view-enter {
+      animation: springSlideFade 0.4s var(--smooth-ease) forwards;
+    }
+
+    @keyframes springSlideFade {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .nav-pill-active {
+      background: linear-gradient(135deg, #6366F1 0%, #06B6D4 100%);
+      box-shadow: 0 6px 18px -4px rgba(6, 182, 212, 0.5);
+    }
+
+    /* Untis Subject Color Codes */
+    .subj-pos { background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.4); color: #818cf8; }
+    .subj-am  { background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.4); color: #22d3ee; }
+    .subj-d   { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: #fb7185; }
+    .subj-e   { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; }
+    .subj-wir { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34d399; }
+    .subj-nw  { background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #c084fc; }
+    .subj-ks  { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); color: #f472b6; }
+
+    /* Untis Status Overrides */
+    .untis-supplierung {
+      background: rgba(245, 158, 11, 0.25) !important;
+      border-color: rgba(245, 158, 11, 0.7) !important;
+      color: #fde047 !important;
+    }
+    .untis-entfall {
+      background: rgba(244, 63, 94, 0.2) !important;
+      border-color: rgba(244, 63, 94, 0.6) !important;
+      color: #fda4af !important;
+      text-decoration: line-through;
+    }
+    .untis-schularbeit {
+      background: rgba(168, 85, 247, 0.3) !important;
+      border-color: rgba(168, 85, 247, 0.8) !important;
+      color: #e9d5ff !important;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 99px; }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden bg-[#080C14] text-slate-100 relative">
+
+  <!-- Ambient Glow Effects -->
+  <div class="fixed top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-cyan-600/15 blur-[140px] pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-indigo-600/15 blur-[160px] pointer-events-none"></div>
+
+  <!-- App Shell -->
+  <div class="flex h-screen w-full overflow-hidden relative z-10">
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+
+      <!-- Header Navigation Bar -->
+      <header class="h-20 px-6 lg:px-10 flex items-center justify-between shrink-0 z-30">
+        <!-- Logo & Class Designation -->
+        <div class="flex items-center space-x-4">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-cyan-500/20">
+            <div class="w-full h-full bg-[#080C14] rounded-[14px] flex items-center justify-center">
+              <i class="fa-solid fa-graduation-cap text-cyan-400 text-lg"></i>
+            </div>
+          </div>
+          <div>
+            <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+              School<span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Organizer</span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">HTL 3AHWII</span>
+            </h1>
+            <p id="header-greeting" class="text-xs text-slate-400">Servus, Lukas Huber 👋 • 5. Semester</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Dock -->
+        <nav class="hidden md:flex items-center cyber-panel px-2 py-1.5 rounded-full space-x-1 shadow-2xl">
+          <button onclick="switchView('welcome')" id="nav-welcome" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-white nav-pill-active transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-sparkles text-sm"></i>
+            <span>Features</span>
+          </button>
+          <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-grid-2 text-sm"></i>
+            <span>Übersicht</span>
+          </button>
+          <button onclick="switchView('timetable')" id="nav-timetable" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-lines text-sm"></i>
+            <span>WebUntis</span>
+          </button>
+          <button onclick="switchView('courses')" id="nav-courses" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-sm"></i>
+            <span>Moodle Kurse</span>
+          </button>
+          <button onclick="switchView('report')" id="nav-report" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-award text-sm"></i>
+            <span>Notenspiegel</span>
+          </button>
+          <button onclick="switchView('todos')" id="nav-todos" class="nav-btn px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-sm"></i>
+            <span>Aufgaben</span>
+          </button>
+        </nav>
+
+        <!-- Right Header Actions -->
+        <div class="flex items-center space-x-3">
+          <button onclick="toggleQuickLauncher()" class="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-900/80 border border-slate-800 rounded-xl text-xs font-mono text-slate-400 hover:text-cyan-300 hover:border-cyan-500/40 transition">
+            <i class="fa-solid fa-terminal text-cyan-400"></i>
+            <span>Schnellsuche</span>
+            <kbd class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded text-slate-300">Ctrl+K</kbd>
+          </button>
+
+          <button onclick="showToast('Keine neuen Untis-Mitteilungen')" class="w-10 h-10 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 transition active:scale-95 relative">
+            <i class="fa-regular fa-bell text-sm"></i>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-cyan-400 rounded-full"></span>
+          </button>
+
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="Lukas Huber" class="w-10 h-10 rounded-xl object-cover ring-2 ring-cyan-500/30 cursor-pointer hover:ring-cyan-400 transition" onclick="switchView('report')">
+        </div>
+      </header>
+
+      <!-- Main Scrollable Container -->
+      <main class="flex-1 overflow-y-auto px-6 lg:px-10 pb-24 md:pb-10 pt-2" id="main-content">
+        
+        <!-- VIEW 0: INTRODUCTION & INTERACTIVE FEATURE SHOWCASE -->
+        <div id="view-welcome" class="view-enter space-y-10 max-w-6xl mx-auto pb-12">
+          
+          <!-- Hero Header -->
+          <div class="text-center space-y-5 pt-4 relative">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold backdrop-blur-md">
+              <i class="fa-solid fa-flag text-rose-400"></i> Österreichischer Schulstandard • WebUntis & Moodle Engine
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight">
+              Dein Schulalltag an der HTL / AHS <br>
+              <span class="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Perfekt & Effizient Organisiert</span>
+            </h1>
+
+            <div class="flex items-center justify-center gap-4 pt-2">
+              <button onclick="switchView('dashboard')" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-cyan-500/20 transition active:scale-95 flex items-center gap-2">
+                Direkt zur Übersicht <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Feature Cards Matrix (Clicking smooth scrolls to live preview stage) -->
+          <div class="space-y-4">
+            <div class="text-center space-y-1 mb-6">
+              <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Klicke ein Modul für die Live-Demo</span>
+            </div>
+
+            <!-- Compact & Visual Feature Targets -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              <!-- Card 1: WebUntis -->
+              <div onclick="selectFeatureDemo('untis')" class="cyber-card p-6 rounded-3xl space-y-4 relative overflow-hidden group cursor-pointer border-t-2 border-t-cyan-500/50">
+                <div class="flex justify-between items-center">
+                  <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-xl border border-cyan-500/30">
+                    <i class="fa-solid fa-calendar-lines"></i>
+                  </div>
+                  <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">WebUntis Live</span>
+                </div>
+                <h3 class="font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">Stundenplan & Supplierungen</h3>
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-cyan-400">
+                  <span>Demo aktivieren & scrollen</span>
+                  <i class="fa-solid fa-arrow-down-long group-hover:translate-y-1 transition-transform"></i>
+                </div>
+              </div>
+
+              <!-- Card 2: Moodle -->
+              <div onclick="selectFeatureDemo('moodle')" class="cyber-card p-6 rounded-3xl space-y-4 relative overflow-hidden group cursor-pointer border-t-2 border-t-indigo-500/50">
+                <div class="flex justify-between items-center">
+                  <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/30">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                  </div>
+                  <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Moodle Hub</span>
+                </div>
+                <h3 class="font-bold text-lg text-white group-hover:text-indigo-300 transition-colors">Abgaben & Übungen</h3>
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-indigo-400">
+                  <span>Demo aktivieren & scrollen</span>
+                  <i class="fa-solid fa-arrow-down-long group-hover:translate-y-1 transition-transform"></i>
+                </div>
+              </div>
+
+              <!-- Card 3: Jahreszeugnis Notenspiegel -->
+              <div onclick="selectFeatureDemo('noten')" class="cyber-card p-6 rounded-3xl space-y-4 relative overflow-hidden group cursor-pointer border-t-2 border-t-emerald-500/50">
+                <div class="flex justify-between items-center">
+                  <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/30">
+                    <i class="fa-solid fa-award"></i>
+                  </div>
+                  <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Zeugnis AT</span>
+                </div>
+                <h3 class="font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">Notenspiegel & Erfolg</h3>
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-emerald-400">
+                  <span>Demo aktivieren & scrollen</span>
+                  <i class="fa-solid fa-arrow-down-long group-hover:translate-y-1 transition-transform"></i>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Interactive Live Sandbox Stage -->
+          <div id="interactive-sandbox" class="cyber-panel p-8 rounded-3xl space-y-6 border border-cyan-500/30 scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <span class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">Live Vorschau Modul</span>
+                <h3 class="text-xl font-bold text-white tracking-tight" id="sandbox-title">WebUntis Live-Stundenplan Vorschau</h3>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="selectFeatureDemo('untis')" id="intro-btn-untis" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition">Untis Plan</button>
+                <button onclick="selectFeatureDemo('moodle')" id="intro-btn-moodle" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800 transition">Moodle Abgabe</button>
+                <button onclick="selectFeatureDemo('noten')" id="intro-btn-noten" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800 transition">Zeugnis-Rechner</button>
+              </div>
+            </div>
+
+            <div id="intro-demo-stage" class="min-h-[220px]">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 1: OVERVIEW DASHBOARD -->
+        <div id="view-dashboard" class="hidden space-y-6">
+
+          <!-- Urgent Widgets Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Next Lesson Widget -->
+            <div class="cyber-panel p-6 rounded-3xl border-l-4 border-l-cyan-400 flex flex-col justify-between space-y-4">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Nächste Stunde (WebUntis)
+                </span>
+                <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Supplierung!</span>
+              </div>
+              
+              <div>
+                <h3 class="text-2xl font-extrabold text-white">POS1 - Software Engineering</h3>
+                <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-user-tie text-cyan-400 mr-1"></i> Prof. Dipl.-Ing. Gruber • <i class="fa-solid fa-location-dot text-cyan-400 mr-1"></i> <span class="text-amber-300 font-semibold font-mono">EDV-3 (statt EDV-1)</span></p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+                <span class="text-slate-400">2. Stunde (08:50 - 09:40)</span>
+                <button onclick="switchView('timetable')" class="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1">Ganzer Tag <i class="fa-solid fa-arrow-right text-[10px]"></i></button>
+              </div>
+            </div>
+
+            <!-- Urgent Homework Widget -->
+            <div class="cyber-panel p-6 rounded-3xl border-l-4 border-l-indigo-500 flex flex-col justify-between space-y-4">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-mono font-bold text-indigo-400 uppercase tracking-wider">Moodle Übung</span>
+                <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">Fällig Heute</span>
+              </div>
+              
+              <div>
+                <h3 class="text-lg font-bold text-white">AM - Integralrechnung SA-Vorbereitung</h3>
+                <p class="text-xs text-slate-400 mt-1">PDF-Abgabe Moodle bis 23:59 Uhr</p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+                <button onclick="submitAssignment(2)" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition active:scale-95 shadow-md">Jetzt abgeben</button>
+                <button onclick="switchView('courses')" class="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1">Alle Aufgaben <i class="fa-solid fa-arrow-right text-[10px]"></i></button>
+              </div>
+            </div>
+
+            <!-- Report Status Quick Summary -->
+            <div class="cyber-panel p-6 rounded-3xl border-l-4 border-l-emerald-400 flex flex-col justify-between space-y-4">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Semesternote (Klasse 3AHWII)</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Schnitt 1.43</span>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                  <i class="fa-solid fa-medal"></i> Mit ausgezeichnetem Erfolg
+                </h4>
+                <p class="text-xs text-slate-400 mt-1">Keine 5er • Alle Schularbeiten absolviert</p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
+                <span>7 Pflichtgegenstände</span>
+                <button onclick="switchView('report')" class="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">Jahreszeugnis <i class="fa-solid fa-arrow-right text-[10px]"></i></button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Main Dashboard Split Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Untis Schedule Today -->
+            <div class="lg:col-span-2 cyber-panel p-6 rounded-3xl space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                  <i class="fa-solid fa-calendar-day text-cyan-400"></i> Tagesplan WebUntis (Klasse 3AHWII)
+                </h3>
+                <span class="text-xs text-slate-400 font-mono">Dienstag, 10. November</span>
+              </div>
+              
+              <div id="dash-schedule-list" class="space-y-3">
+                <!-- JS populated -->
+              </div>
+            </div>
+
+            <!-- Task Engine Widget -->
+            <div class="cyber-panel p-6 rounded-3xl space-y-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-emerald-400"></i> Hausübungen & Tasks
+                  </h3>
+                  <span id="dash-pending-count" class="text-xs font-mono font-bold text-emerald-400">0 Offen</span>
+                </div>
+
+                <form id="dash-quick-todo-form" class="mt-4 flex gap-2">
+                  <input type="text" id="dash-todo-input" placeholder="Aufgabe hinzufügen..." required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
+                  <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button>
+                </form>
+
+                <div id="dash-todo-list" class="space-y-2.5 mt-4">
+                  <!-- JS populated -->
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-slate-800 text-center">
+                <button onclick="switchView('todos')" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center justify-center gap-1 w-full">
+                  Alle Lernziele verwalten <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- VIEW 2: UNTIS TIMETABLE (Subject Color-Coded Grid) -->
+        <div id="view-timetable" class="hidden space-y-6">
+          <div class="cyber-panel p-6 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white tracking-tight">WebUntis Stundenplan • Klasse 3AHWII</h2>
+              <p class="text-xs text-slate-400">Farbcodierte Gegenstände mit Live-Supplierungen, Entfällen & Schularbeiten</p>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button onclick="changeWeek(-1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-semibold border border-slate-800 transition active:scale-95"><i class="fa-solid fa-chevron-left mr-1"></i> Vorherige</button>
+              <span class="text-xs font-mono font-semibold px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-300">Woche 46 (Aktuell)</span>
+              <button onclick="changeWeek(1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-semibold border border-slate-800 transition active:scale-95">Nächste <i class="fa-solid fa-chevron-right ml-1"></i></button>
+            </div>
+          </div>
+
+          <!-- Color Legend Legend Bar -->
+          <div class="flex flex-wrap gap-3 text-xs font-medium px-2">
+            <span class="px-2.5 py-1 rounded-lg border subj-pos font-mono font-bold text-[11px]">POS</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-am font-mono font-bold text-[11px]">AM</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-d font-mono font-bold text-[11px]">D</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-e font-mono font-bold text-[11px]">E</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-wir font-mono font-bold text-[11px]">WIR</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-nw font-mono font-bold text-[11px]">NW</span>
+            <span class="px-2.5 py-1 rounded-lg border subj-ks font-mono font-bold text-[11px]">KS</span>
+            <span class="text-slate-600">|</span>
+            <span class="px-2.5 py-1 rounded-lg untis-supplierung font-bold text-[11px]">Supplierung</span>
+            <span class="px-2.5 py-1 rounded-lg untis-entfall font-bold text-[11px]">Entfall</span>
+            <span class="px-2.5 py-1 rounded-lg untis-schularbeit font-bold text-[11px]">Schularbeit</span>
+          </div>
+
+          <!-- Timetable Grid -->
+          <div class="cyber-panel rounded-3xl p-5 overflow-x-auto">
+            <table class="w-full min-w-[800px] border-collapse">
+              <thead>
+                <tr class="text-xs font-bold text-slate-400 border-b border-slate-800">
+                  <th class="p-3 w-28 text-center font-mono">Stunde / Zeit</th>
+                  <th class="p-3 w-1/5 text-center">Montag</th>
+                  <th class="p-3 w-1/5 text-center">Dienstag</th>
+                  <th class="p-3 w-1/5 text-center">Mittwoch</th>
+                  <th class="p-3 w-1/5 text-center">Donnerstag</th>
+                  <th class="p-3 w-1/5 text-center">Freitag</th>
+                </tr>
+              </thead>
+              <tbody id="timetable-grid-body" class="divide-y divide-slate-800/60 text-xs">
+                <!-- JS populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 3: MOODLE COURSES -->
+        <div id="view-courses" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white tracking-tight">Moodle Kurse & Lernmaterialien</h2>
+              <p class="text-xs text-slate-400">Gegenstände der 3AHWII mit Farb-Zuordnung & Moodle-Skripten</p>
+            </div>
+          </div>
+
+          <!-- Courses Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courses-full-grid">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+        <!-- VIEW 4: AUSTRIAN END-OF-YEAR REPORT CARD (JAHRESZEUGNIS / NOTENSPIEGEL) -->
+        <div id="view-report" class="hidden space-y-6">
+          <div class="cyber-panel p-6 rounded-3xl border border-cyan-500/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-2">
+                <i class="fa-solid fa-certificate"></i> SchOrg AT • Zeugnisberechnung § 22 SchUG
+              </div>
+              <h2 class="text-2xl font-extrabold text-white tracking-tight">Jahreszeugnis / Notenspiegel (Klasse 3AHWII)</h2>
+              <p class="text-xs text-slate-400 mt-1">Notenskala: 1 (Sehr gut) bis 5 (Nicht genügend) • Stand 5. Semester</p>
+            </div>
+
+            <!-- Calculated Overall Status Card -->
+            <div id="report-status-badge" class="px-6 py-4 rounded-2xl bg-emerald-950/60 border-2 border-emerald-400/80 text-center space-y-1 shadow-xl">
+              <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-extrabold">Gesamtkalkulation</span>
+              <div class="text-lg font-extrabold text-white flex items-center justify-center gap-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i>
+                <span id="report-result-text">Mit ausgezeichnetem Erfolg</span>
+              </div>
+              <div class="text-xs font-mono text-emerald-300 font-bold" id="report-avg-text">Notenschnitt: 1.43</div>
+            </div>
+          </div>
+
+          <!-- Subject Grades Breakdown Grid -->
+          <div class="cyber-panel p-6 rounded-3xl space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+              <h3 class="font-bold text-lg text-white">Pflichtgegenstände & Leistungsbeurteilung</h3>
+              <span class="text-xs text-slate-400 font-mono">Stand: 10.11.2026</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-slate-400 font-mono border-b border-slate-800">
+                    <th class="pb-3 pl-2">Gegenstand</th>
+                    <th class="pb-3">Lehrkraft</th>
+                    <th class="pb-3 text-center">1. SA</th>
+                    <th class="pb-3 text-center">2. SA</th>
+                    <th class="pb-3 text-center">Mitarbeit / Tests</th>
+                    <th class="pb-3 text-center">Semesternote</th>
+                    <th class="pb-3 text-center">Beurteilung</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body" class="divide-y divide-slate-800/60 font-medium">
+                  <!-- JS populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 5: TASK MANAGER -->
+        <div id="view-todos" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white tracking-tight">Hausübungen & Lernziele</h2>
+              <p class="text-xs text-slate-400">Verwalte deine Aufgaben für die HTL-Fächer</p>
+            </div>
+
+            <button onclick="clearCompletedTodos()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition active:scale-95 flex items-center gap-1.5">
+              <i class="fa-solid fa-trash-can text-slate-400"></i> Erledigte löschen
+            </button>
+          </div>
+
+          <!-- Form Input -->
+          <form id="full-todo-form" class="cyber-panel p-4 rounded-3xl flex flex-col sm:flex-row gap-3">
+            <input type="text" id="full-todo-title" placeholder="Neue Hausübung oder Lernziel..." required class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
+            
+            <select id="full-todo-course" class="bg-slate-950 border border-slate-800 rounded-2xl px-3 py-2.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+              <option value="POS1">POS1</option>
+              <option value="AM">AM (Mathematik)</option>
+              <option value="D">D (Deutsch)</option>
+              <option value="E">E (Englisch)</option>
+              <option value="WIR">WIR (Wirtschaft)</option>
+              <option value="NW">NW (Physik/Chem)</option>
+              <option value="KS">KS (Konstruktion)</option>
+            </select>
+
+            <select id="full-todo-priority" class="bg-slate-950 border border-slate-800 rounded-2xl px-3 py-2.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+              <option value="Hoch">Hohe Priorität</option>
+              <option value="Mittel" selected>Mittlere Priorität</option>
+              <option value="Niedrig">Niedrige Priorität</option>
+            </select>
+
+            <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs px-6 py-2.5 rounded-2xl transition active:scale-95 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-plus"></i> Hinzufügen
+            </button>
+          </form>
+
+          <!-- Task List Container -->
+          <div class="cyber-panel p-6 rounded-3xl space-y-4">
+            <div id="full-todo-list-container" class="space-y-2.5">
+              <!-- JS populated -->
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Bottom Mobile Nav -->
+      <div class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md">
+        <nav class="cyber-panel p-2 rounded-full flex items-center justify-around shadow-2xl border border-cyan-500/30">
+          <button onclick="switchView('welcome')" id="mob-nav-welcome" class="p-3 text-cyan-400"><i class="fa-solid fa-sparkles text-lg"></i></button>
+          <button onclick="switchView('dashboard')" id="mob-nav-dashboard" class="p-3 text-slate-400"><i class="fa-solid fa-grid-2 text-lg"></i></button>
+          <button onclick="switchView('timetable')" id="mob-nav-timetable" class="p-3 text-slate-400"><i class="fa-solid fa-calendar-lines text-lg"></i></button>
+          <button onclick="switchView('courses')" id="mob-nav-courses" class="p-3 text-slate-400"><i class="fa-solid fa-book-bookmark text-lg"></i></button>
+          <button onclick="switchView('report')" id="mob-nav-report" class="p-3 text-slate-400"><i class="fa-solid fa-award text-lg"></i></button>
+          <button onclick="switchView('todos')" id="mob-nav-todos" class="p-3 text-slate-400"><i class="fa-solid fa-list-check text-lg"></i></button>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Command Launcher Modal -->
+  <div id="quick-launcher-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-start justify-center pt-24 p-4">
+    <div class="cyber-panel max-w-lg w-full p-4 rounded-3xl space-y-3 shadow-2xl relative border border-cyan-500/40">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 text-xs"></i>
+        <input type="text" id="launcher-search" placeholder="Befehl oder Fach eingeben..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+      </div>
+      
+      <div class="space-y-1 text-xs">
+        <button onclick="switchView('timetable'); toggleQuickLauncher();" class="w-full p-3 rounded-xl flex items-center justify-between text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition text-left">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-lines text-cyan-400"></i> WebUntis Stundenplan 3AHWII</span>
+          <span class="font-mono text-[10px] text-slate-500">Öffnen</span>
+        </button>
+        <button onclick="switchView('report'); toggleQuickLauncher();" class="w-full p-3 rounded-xl flex items-center justify-between text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition text-left">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-award text-emerald-400"></i> Jahreszeugnis & Notenspiegel AT</span>
+          <span class="font-mono text-[10px] text-slate-500">Erfolg prüfen</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Modal -->
+  <div id="app-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="cyber-panel max-w-lg w-full p-6 rounded-3xl space-y-4 shadow-2xl relative border border-cyan-500/30">
+      <button onclick="closeModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-6 right-6 cyber-panel text-white text-xs font-bold px-5 py-3.5 rounded-2xl shadow-2xl border border-cyan-500/40 translate-y-[-100px] opacity-0 transition-all duration-500 z-50 flex items-center space-x-3">
+    <div class="w-7 h-7 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs border border-cyan-500/30">
+      <i class="fa-solid fa-bolt"></i>
+    </div>
+    <span id="toast-msg">Mitteilung</span>
+  </div>
+
+  <script>
+    let currentView = 'welcome';
+
+    // Subject Color Mapping
+    const subjectColors = {
+      'POS': { class: 'subj-pos', hex: '#818cf8', title: 'Programmieren & Software Eng.' },
+      'AM':  { class: 'subj-am',  hex: '#22d3ee', title: 'Angewandte Mathematik' },
+      'D':   { class: 'subj-d',   hex: '#fb7185', title: 'Deutsch & Kommunikation' },
+      'E':   { class: 'subj-e',   hex: '#fbbf24', title: 'Englisch' },
+      'WIR': { class: 'subj-wir', hex: '#34d399', title: 'Wirtschaft & Recht' },
+      'NW':  { class: 'subj-nw',  hex: '#c084fc', title: 'Naturwissenschaften' },
+      'KS':  { class: 'subj-ks',  hex: '#f472b6', title: 'Konstruktion & Projekt' }
+    };
+
+    // Austrian School Timetable Data
+    const timetableData = [
+      {
+        period: "1. St. (08:00 - 08:50)",
+        mon: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "regular" },
+        tue: { subject: "AM", room: "Klasse 3A", teacher: "Dr. Steiner", status: "regular" },
+        wed: { subject: "D", room: "Klasse 3A", teacher: "Mag. Bauer", status: "regular" },
+        thu: { subject: "E", room: "Sprachraum", teacher: "Prof. Miller", status: "schularbeit", note: "1. Schularbeit!" },
+        fri: { subject: "NW", room: "Physik-Saal", teacher: "Dr. Curie", status: "regular" }
+      },
+      {
+        period: "2. St. (08:50 - 09:40)",
+        mon: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "regular" },
+        tue: { subject: "POS", room: "EDV-3", teacher: "Prof. Gruber", status: "supplierung", note: "Raumwechsel auf EDV-3" },
+        wed: { subject: "D", room: "Klasse 3A", teacher: "Mag. Bauer", status: "regular" },
+        thu: { subject: "E", room: "Sprachraum", teacher: "Prof. Miller", status: "regular" },
+        fri: { subject: "WIR", room: "Klasse 3A", teacher: "Mag. Wallner", status: "regular" }
+      },
+      {
+        period: "3. St. (09:55 - 10:45)",
+        mon: { subject: "WIR", room: "Klasse 3A", teacher: "Mag. Wallner", status: "regular" },
+        tue: { subject: "KS", room: "CAD-Labor", teacher: "Ing. Hofer", status: "regular" },
+        wed: { subject: "AM", room: "Klasse 3A", teacher: "Dr. Steiner", status: "regular" },
+        thu: { subject: "KS", room: "CAD-Labor", teacher: "Ing. Hofer", status: "regular" },
+        fri: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "entfall", note: "Entfall wg. Konferenz" }
+      }
+    ];
+
+    // Moodle Courses Data
+    const coursesData = [
+      { id: 'pos', code: 'POS1', title: 'Programmieren & Software Eng.', instructor: 'Prof. Gruber', progress: 90, icon: 'fa-code', subject: 'POS', materials: ['C#_ObjectOriented.pdf', 'SQL_Lab_UE.pdf'] },
+      { id: 'am', code: 'AM', title: 'Angewandte Mathematik', instructor: 'Dr. Steiner', progress: 85, icon: 'fa-calculator', subject: 'AM', materials: ['Integralrechnung_SA3.pdf'] },
+      { id: 'd', code: 'D', title: 'Deutsch & Kommunikation', instructor: 'Mag. Bauer', progress: 95, icon: 'fa-feather', subject: 'D', materials: ['Erörterung_MaturaStandard.pdf'] },
+      { id: 'e', code: 'E', title: 'Englisch (B2/C1)', instructor: 'Prof. Miller', progress: 88, icon: 'fa-language', subject: 'E', materials: ['Technical_Vocabulary.pdf'] },
+      { id: 'wir', code: 'WIR', title: 'Wirtschaft & Recht', instructor: 'Mag. Wallner', progress: 92, icon: 'fa-chart-pie', subject: 'WIR', materials: ['Unternehmensrecht_HTL.pdf'] }
+    ];
+
+    // Austrian Grading System Data (Austrian Standards: 1 to 5)
+    const reportGradesData = [
+      { subject: "POS", title: "Programmieren & Software Eng.", teacher: "Prof. Gruber", sa1: 1, sa2: 1, mitarbeit: "Sehr gut", final: 1 },
+      { subject: "AM", title: "Angewandte Mathematik", teacher: "Dr. Steiner", sa1: 2, sa2: 1, mitarbeit: "Gut", final: 1 },
+      { subject: "D", title: "Deutsch & Kommunikation", teacher: "Mag. Bauer", sa1: 1, sa2: 2, mitarbeit: "Sehr gut", final: 1 },
+      { subject: "E", title: "Englisch", teacher: "Prof. Miller", sa1: 2, sa2: 2, mitarbeit: "Gut", final: 2 },
+      { subject: "WIR", title: "Wirtschaft & Recht", teacher: "Mag. Wallner", sa1: 1, sa2: 1, mitarbeit: "Sehr gut", final: 1 },
+      { subject: "NW", title: "Naturwissenschaften", teacher: "Dr. Curie", sa1: 2, sa2: 2, mitarbeit: "Gut", final: 2 },
+      { subject: "KS", title: "Konstruktion & Projekt", teacher: "Ing. Hofer", sa1: 2, sa2: 2, mitarbeit: "Sehr gut", final: 2 }
+    ];
+
+    let todosData = [
+      { id: 1, title: 'POS Abgabe C# Polymorphie Übung', course: 'POS1', priority: 'Hoch', completed: false },
+      { id: 2, title: 'AM Beispiele Integralrechnung S. 142', course: 'AM', priority: 'Hoch', completed: false },
+      { id: 3, title: 'D Textanalyse Kafka vorbereiten', course: 'D', priority: 'Mittel', completed: true }
+    ];
+
+    window.onload = function() {
+      selectFeatureDemo('untis');
+      renderDashboard();
+      renderTimetable();
+      renderCourses();
+      renderReportCard();
+      renderTodos();
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          toggleQuickLauncher();
+        }
+      });
+
+      document.getElementById('dash-quick-todo-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('dash-todo-input');
+        if (input.value.trim()) {
+          addTodo(input.value.trim(), 'POS1', 'Mittel');
+          input.value = '';
+        }
+      });
+
+      document.getElementById('full-todo-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('full-todo-title').value.trim();
+        const course = document.getElementById('full-todo-course').value;
+        const priority = document.getElementById('full-todo-priority').value;
+        if (title) {
+          addTodo(title, course, priority);
+          document.getElementById('full-todo-title').value = '';
+        }
+      });
+    };
+
+    function switchView(viewName) {
+      currentView = viewName;
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('nav-pill-active', 'text-white');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeNav = document.getElementById(`nav-${viewName}`);
+      if (activeNav) {
+        activeNav.classList.add('nav-pill-active', 'text-white');
+        activeNav.classList.remove('text-slate-400');
+      }
+
+      ['welcome', 'dashboard', 'timetable', 'courses', 'report', 'todos'].forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (v === viewName) {
+          el.classList.remove('hidden');
+          el.classList.add('view-enter');
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('view-enter');
+        }
+      });
+    }
+
+    // Feature card selection handler with auto-scroll to sandbox stage
+    function selectFeatureDemo(type) {
+      const stage = document.getElementById('intro-demo-stage');
+      const title = document.getElementById('sandbox-title');
+
+      ['untis', 'moodle', 'noten'].forEach(t => {
+        const btn = document.getElementById(`intro-btn-${t}`);
+        if (btn) {
+          if (t === type) {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition';
+          } else {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800 transition';
+          }
+        }
+      });
+
+      if (type === 'untis') {
+        title.textContent = 'WebUntis Live-Stundenplan Vorschau (3AHWII)';
+        stage.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-300">
+            <div class="p-4 rounded-2xl untis-supplierung font-medium">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/30">Supplierung / Raumwechsel</span>
+              <h4 class="font-bold text-white text-sm mt-2">POS1 - Software Eng. (EDV-3)</h4>
+              <p class="text-xs text-amber-200 mt-1">2. Stunde (08:50 - 09:40) • Prof. Gruber</p>
+            </div>
+            <div class="p-4 rounded-2xl untis-schularbeit">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/40">1. Schularbeit</span>
+              <h4 class="font-bold text-white text-sm mt-2">Englisch (B2/C1)</h4>
+              <p class="text-xs text-purple-200 mt-1">Donnerstag 1. Stunde • Sprachraum</p>
+            </div>
+          </div>
+        `;
+      } else if (type === 'moodle') {
+        title.textContent = 'Moodle Abgabe-Workflow Vorschau';
+        stage.innerHTML = `
+          <div class="cyber-card p-5 rounded-2xl space-y-3 animate-in fade-in duration-300">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">AM - Integralrechnung SA-Vorbereitung.pdf</span>
+              <span class="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">Fällig 23:59 Uhr</span>
+            </div>
+            <p class="text-xs text-slate-400">Klicke zum Testen der sofortigen Moodle-Abgabebestätigung</p>
+            <button onclick="submitAssignment(2)" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-indigo-600 text-slate-950 font-bold text-xs rounded-xl transition active:scale-95 shadow-md">
+              Test-Abgabe einreichen
+            </button>
+          </div>
+        `;
+      } else if (type === 'noten') {
+        title.textContent = 'Austrian End-of-Year Report Calculator';
+        stage.innerHTML = `
+          <div class="cyber-card p-5 rounded-2xl space-y-3 animate-in fade-in duration-300">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400">Österreichischer Notenspiegel (Klasse 3AHWII)</span>
+              <span class="text-xs font-mono font-bold text-white bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">Schnitt: 1.43</span>
+            </div>
+            <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-500/30 text-xs text-emerald-300 font-bold flex items-center justify-between">
+              <span>Status: Mit ausgezeichnetem Erfolg abgeschlossen</span>
+              <i class="fa-solid fa-award text-amber-400 text-base"></i>
+            </div>
+          </div>
+        `;
+      }
+
+      // Smooth scroll down to sandbox stage
+      document.getElementById('interactive-sandbox').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderDashboard() {
+      const scheduleContainer = document.getElementById('dash-schedule-list');
+      scheduleContainer.innerHTML = '';
+
+      timetableData.forEach(row => {
+        const item = row.tue;
+        const colorInfo = subjectColors[item.subject] || { class: 'subj-pos', hex: '#6366F1' };
+        
+        let overrideClass = colorInfo.class;
+        let statusTag = '';
+
+        if (item.status === 'supplierung') {
+          overrideClass = 'untis-supplierung';
+          statusTag = `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/30">Supplierung</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl flex items-center justify-between border ${overrideClass}`;
+        card.innerHTML = `
+          <div class="flex items-center space-x-3.5">
+            <span class="text-xs font-mono font-bold opacity-80">${row.period.split(' ')[0]}</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-white text-sm">${item.subject}</h4>
+                ${statusTag}
+              </div>
+              <p class="text-xs opacity-80 mt-0.5">${item.teacher} • <span class="font-semibold font-mono">${item.room}</span></p>
+            </div>
+          </div>
+          <button onclick="showScheduleDetails('${item.subject}', '${item.teacher}', '${item.room}', '${item.status}')" class="opacity-80 hover:opacity-100 p-2 text-xs">
+            <i class="fa-solid fa-circle-info text-sm"></i>
+          </button>
+        `;
+        scheduleContainer.appendChild(card);
+      });
+
+      renderDashboardTodos();
+    }
+
+    function renderDashboardTodos() {
+      const dashList = document.getElementById('dash-todo-list');
+      dashList.innerHTML = '';
+
+      const pending = todosData.filter(t => !t.completed);
+      document.getElementById('dash-pending-count').textContent = `${pending.length} Offen`;
+
+      todosData.slice(0, 4).forEach(todo => {
+        const item = document.createElement('div');
+        item.className = 'cyber-card p-2.5 rounded-xl flex items-center justify-between text-xs';
+        item.innerHTML = `
+          <div class="flex items-center space-x-2.5 overflow-hidden">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodoState(${todo.id})" class="rounded border-slate-700 text-cyan-500 focus:ring-0 bg-slate-900 cursor-pointer">
+            <span class="${todo.completed ? 'line-through text-slate-500' : 'text-slate-200'} truncate">${todo.title}</span>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${todo.priority === 'Hoch' ? 'bg-rose-500/20 text-rose-300' : 'bg-slate-800 text-slate-400'}">${todo.priority}</span>
+        `;
+        dashList.appendChild(item);
+      });
+    }
+
+    function renderTimetable() {
+      const tbody = document.getElementById('timetable-grid-body');
+      tbody.innerHTML = '';
+
+      timetableData.forEach(row => {
+        const tr = document.createElement('tr');
+        let periodHtml = `<td class="p-3 text-slate-400 font-mono text-center border-r border-slate-800">${row.period.replace(' ', '<br>')}</td>`;
+        
+        let daysHtml = '';
+        ['mon', 'tue', 'wed', 'thu', 'fri'].forEach(dayKey => {
+          const cell = row[dayKey];
+          const colorInfo = subjectColors[cell.subject] || { class: 'subj-pos' };
+          
+          let cellStyle = `border ${colorInfo.class}`;
+          if (cell.status === 'supplierung') cellStyle = 'untis-supplierung border';
+          if (cell.status === 'entfall') cellStyle = 'untis-entfall border';
+          if (cell.status === 'schularbeit') cellStyle = 'untis-schularbeit border';
+
+          daysHtml += `
+            <td class="p-2">
+              <div class="p-3 rounded-2xl ${cellStyle} cursor-pointer hover:scale-[1.02] transition" onclick="showScheduleDetails('${cell.subject}', '${cell.teacher}', '${cell.room}', '${cell.status}')">
+                <div class="font-bold text-xs">${cell.subject}</div>
+                <div class="flex justify-between items-center text-[10px] opacity-80 mt-1">
+                  <span>${cell.teacher}</span>
+                  <span class="font-mono font-bold">${cell.room}</span>
+                </div>
+              </div>
+            </td>
+          `;
+        });
+
+        tr.innerHTML = periodHtml + daysHtml;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCourses() {
+      const container = document.getElementById('courses-full-grid');
+      container.innerHTML = '';
+
+      coursesData.forEach(course => {
+        const colorInfo = subjectColors[course.subject] || { class: 'subj-pos', hex: '#6366F1' };
+
+        const card = document.createElement('div');
+        card.className = `cyber-card p-6 rounded-3xl space-y-4 flex flex-col justify-between border-t-2`;
+        card.style.borderTopColor = colorInfo.hex;
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex justify-between items-start">
+              <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg border ${colorInfo.class}">
+                <i class="fa-solid ${course.icon}"></i>
+              </div>
+              <span class="text-xs font-mono bg-slate-900 px-2.5 py-1 rounded-full text-slate-400 border border-slate-800">${course.code}</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base tracking-tight">${course.title}</h3>
+              <p class="text-xs text-slate-400">${course.instructor}</p>
+            </div>
+            <div class="space-y-1.5">
+              <p class="text-xs font-bold text-slate-300">Moodle Lernunterlagen</p>
+              ${course.materials.map(m => `
+                <div class="flex items-center text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                  <i class="fa-regular fa-file-pdf mr-2" style="color:${colorInfo.hex}"></i>
+                  <span class="truncate">${m}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">Fortschritt: ${course.progress}%</span>
+            <button onclick="openCourseModal('${course.id}')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 transition active:scale-95 shadow-md" style="background-color: ${colorInfo.hex}">Moodle Öffen</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Austrian End-of-Year Report Calculation (§ 22 SchUG)
+    function renderReportCard() {
+      const tbody = document.getElementById('report-table-body');
+      tbody.innerHTML = '';
+
+      let totalGrade = 0;
+      let count = reportGradesData.length;
+      let hasFive = false;
+      let hasFour = false;
+
+      reportGradesData.forEach(item => {
+        totalGrade += item.final;
+        if (item.final === 5) hasFive = true;
+        if (item.final === 4) hasFour = true;
+
+        const colorInfo = subjectColors[item.subject] || { class: 'subj-pos' };
+
+        // Austrian Grade Badge Labels
+        const gradeNames = { 1: 'Sehr gut (1)', 2: 'Gut (2)', 3: 'Befriedigend (3)', 4: 'Genügend (4)', 5: 'Nicht genügend (5)' };
+        let gradeBadge = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+        if (item.final === 2) gradeBadge = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+        if (item.final === 5) gradeBadge = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="py-3.5 pl-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${colorInfo.class}">${item.subject}</span>
+              <span class="text-white font-bold">${item.title}</span>
+            </div>
+          </td>
+          <td class="py-3.5 text-slate-400">${item.teacher}</td>
+          <td class="py-3.5 text-center font-mono text-cyan-300 font-bold">${item.sa1}</td>
+          <td class="py-3.5 text-center font-mono text-cyan-300 font-bold">${item.sa2}</td>
+          <td class="py-3.5 text-center text-slate-300">${item.mitarbeit}</td>
+          <td class="py-3.5 text-center font-mono text-lg font-bold text-white">${item.final}</td>
+          <td class="py-3.5 text-center">
+            <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold border ${gradeBadge}">
+              ${gradeNames[item.final]}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const avg = (totalGrade / count).toFixed(2);
+      document.getElementById('report-avg-text').textContent = `Notenschnitt: ${avg}`;
+
+      // Austrian Standard Evaluation Rules:
+      let resultText = "Bestanden";
+      if (hasFive) {
+        resultText = "Nicht bestanden (Wiederholungsprüfung erforderlich)";
+      } else if (avg <= 1.50 && !hasFour) {
+        resultText = "Mit ausgezeichnetem Erfolg abgeschlossen";
+      } else if (avg <= 2.00 && !hasFive) {
+        resultText = "Mit gutem Erfolg abgeschlossen";
+      }
+
+      document.getElementById('report-result-text').textContent = resultText;
+    }
+
+    function renderTodos() {
+      const container = document.getElementById('full-todo-list-container');
+      container.innerHTML = '';
+
+      todosData.forEach(todo => {
+        let prioBadge = 'bg-slate-800 text-slate-400';
+        if (todo.priority === 'Hoch') prioBadge = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+
+        const item = document.createElement('div');
+        item.className = `cyber-card p-3.5 rounded-2xl flex items-center justify-between gap-3 ${todo.completed ? 'opacity-50' : ''}`;
+        item.innerHTML = `
+          <div class="flex items-center space-x-3.5 overflow-hidden">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodoState(${todo.id})" class="w-4 h-4 rounded border-slate-700 text-cyan-500 focus:ring-0 bg-slate-900 cursor-pointer">
+            <div>
+              <p class="text-xs font-bold ${todo.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${todo.title}</p>
+              <span class="text-[10px] text-cyan-400 font-mono">${todo.course}</span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold ${prioBadge}">${todo.priority}</span>
+            <button onclick="deleteTodo(${todo.id})" class="text-slate-500 hover:text-rose-400 text-xs p-1 transition"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function addTodo(title, course, priority) {
+      todosData.unshift({ id: Date.now(), title, course, priority, completed: false });
+      renderDashboardTodos();
+      renderTodos();
+      showToast('Aufgabe hinzugefügt!');
+    }
+
+    function toggleTodoState(id) {
+      const todo = todosData.find(t => t.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+        if (todo.completed && typeof confetti === 'function') confetti({ particleCount: 50, spread: 60 });
+        renderDashboardTodos();
+        renderTodos();
+        showToast(todo.completed ? 'Aufgabe erledigt! 🎉' : 'Aufgabe wiederhergestellt');
+      }
+    }
+
+    function deleteTodo(id) {
+      todosData = todosData.filter(t => t.id !== id);
+      renderDashboardTodos();
+      renderTodos();
+      showToast('Aufgabe entfernt');
+    }
+
+    function clearCompletedTodos() {
+      todosData = todosData.filter(t => !t.completed);
+      renderDashboardTodos();
+      renderTodos();
+      showToast('Erledigte Aufgaben bereinigt');
+    }
+
+    function submitAssignment(id) {
+      if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 80 });
+      showToast('Moodle-Abgabe erfolgreich übermittelt!');
+    }
+
+    function changeWeek(direction) {
+      showToast(direction > 0 ? 'Nächste Schulwoche geladen' : 'Vorherige Schulwoche geladen');
+    }
+
+    function toggleQuickLauncher() {
+      const launcher = document.getElementById('quick-launcher-modal');
+      launcher.classList.toggle('hidden');
+      if (!launcher.classList.contains('hidden')) {
+        document.getElementById('launcher-search').focus();
+      }
+    }
+
+    function openCourseModal(courseId) {
+      const course = coursesData.find(c => c.id === courseId);
+      if (!course) return;
+
+      const modalContent = document.getElementById('modal-content');
+      modalContent.innerHTML = `
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg border border-cyan-500/30">
+            <i class="fa-solid ${course.icon}"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">${course.title}</h3>
+            <p class="text-xs text-slate-400 font-mono">${course.code} • ${course.instructor}</p>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-slate-300">Skripten & Unterlagen</h4>
+          ${course.materials.map(m => `
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+              <span class="text-slate-200 truncate mr-2"><i class="fa-solid fa-file-pdf text-cyan-400 mr-2"></i> ${m}</span>
+              <button onclick="showToast('Herunterladen gestartet...')" class="text-cyan-400 hover:text-cyan-300 font-bold shrink-0">Download</button>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="pt-4 flex justify-end">
+          <button onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-xl font-bold transition">Schließen</button>
+        </div>
+      `;
+
+      document.getElementById('app-modal').classList.remove('hidden');
+    }
+
+    function showScheduleDetails(subject, teacher, room, status) {
+      const modalContent = document.getElementById('modal-content');
+      modalContent.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex justify-between items-start">
+            <h3 class="text-lg font-bold text-white">${subject}</h3>
+            <span class="text-xs px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-mono font-bold">${room}</span>
+          </div>
+          <div class="text-xs text-slate-300 space-y-1.5">
+            <p><span class="text-slate-400">Lehrkraft:</span> ${teacher}</p>
+            <p><span class="text-slate-400">Status:</span> ${status.toUpperCase()}</p>
+          </div>
+          <div class="pt-4 flex justify-end">
+            <button onclick="closeModal()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs px-4 py-2 rounded-xl font-bold transition">Schließen</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('app-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('app-modal').classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-100px]', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

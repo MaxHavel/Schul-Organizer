@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchoolOrganizer – Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #f4f6f7;
+      color: #333;
+      line-height: 1.4;
+    }
+    .app {
+      display: flex;
+      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Login Screen View */
+    #view-login {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #2c3e50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .login-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      width: 350px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      border: 3px solid #1a252f;
+    }
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+      text-align: center;
+    }
+    .login-box input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 2px solid #cbd5e1;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      flex-shrink: 0;
+      border-right: 3px solid #1a252f;
+    }
+    .logo {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 25px;
+      color: #fff;
+    }
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .sidebar nav button {
+      background: transparent;
+      border: none;
+      color: #bdc3c7;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    .sidebar nav button:hover {
+      background-color: #34495e;
+      color: #fff;
+    }
+    .sidebar nav button.aktiv {
+      background-color: #3498db;
+      color: #fff;
+      font-weight: bold;
+    }
+    .sidebar-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid #34495e;
+      padding-top: 15px;
+    }
+    .user-info {
+      font-size: 0.85rem;
+      color: #bdc3c7;
+    }
+    .user-info strong {
+      color: #fff;
+    }
+    .settings-btn {
+      background: transparent;
+      border: 2px solid #bdc3c7;
+      color: #bdc3c7;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .settings-btn:hover {
+      background: #34495e;
+      color: #fff;
+      border-color: #fff;
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+    }
+    .kopf {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .kopf h1 {
+      font-size: 1.5rem;
+      color: #2c3e50;
+    }
+
+    /* Generic Components mit dickeren Außenlinien */
+    .card {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .card h2, .card h3 {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+    .btn {
+      background-color: #3498db;
+      color: #fff;
+      border: 2px solid #2980b9;
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background-color: #2980b9;
+    }
+    .btn-secondary {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      border: 2px solid #bdc3c7;
+    }
+    .btn-secondary:hover {
+      background-color: #bdc3c7;
+    }
+    .btn-danger {
+      background-color: #e74c3c;
+      color: #fff;
+      border: 2px solid #c0392b;
+    }
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+
+    /* Grid Layouts */
+    .grid {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .grid.zwei { grid-template-columns: repeat(2, 1fr); }
+    .grid.drei { grid-template-columns: repeat(3, 1fr); }
+    .grid.vier { grid-template-columns: repeat(4, 1fr); }
+
+    /* Key Values & Badges */
+    .punkte {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      background: #e2e8f0;
+      color: #475569;
+      border: 1px solid #94a3b8;
+    }
+
+    /* Priority Badges */
+    .prio-hoch { background-color: #fadbd8; color: #922b21; border-color: #f1948a; }
+    .prio-mittel { background-color: #fdebd0; color: #b9770e; border-color: #f8c471; }
+    .prio-niedrig { background-color: #d4efdf; color: #1e8449; border-color: #a9dfbf; }
+
+    /* Status Badges & Untis Cells */
+    .untis-normal {
+      background: #e9ecef;
+      border-radius: 6px;
+      padding: 12px;
+      color: #495057;
+      border: 2px solid #ced4da;
+    }
+    .status-supplierung { background: #fff3cd !important; color: #664d03 !important; border-left: 6px solid #ffc107; border: 2px solid #ffecb5; border-radius: 6px; padding: 12px; }
+    .status-entfall { background: #f8d7da !important; color: #842029 !important; border-left: 6px solid #dc3545; text-decoration: line-through; border: 2px solid #f5c2c7; border-radius: 6px; padding: 12px; }
+    .status-schularbeit { background: #f3e8ff !important; color: #6b21a8 !important; border-left: 6px solid #a855f7; border: 2px solid #e9d5ff; border-radius: 6px; padding: 12px; }
+
+    /* Untis Legend & Tables mit dickeren vertikalen Linien & verlängerter Länge */
+    .untis-legend {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+    .timetable-table th, .timetable-table td {
+      border-right: 3px solid #64748b;
+      padding: 16px 10px; /* Vertikal länger gemacht */
+    }
+    .timetable-table th:last-child, .timetable-table td:last-child {
+      border-right: none;
+    }
+    .timetable-table th {
+      border-bottom: 3px solid #64748b;
+    }
+
+    /* Noten Farben (1 bis 5) */
+    .grade-badge {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+      border-radius: 50%;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.8rem;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    .grade-1 { background-color: #2ecc71; }
+    .grade-2 { background-color: #27ae60; }
+    .grade-3 { background-color: #f1c40f; color: #333; }
+    .grade-4 { background-color: #e67e22; }
+    .grade-5 { background-color: #e74c3c; }
+
+    /* Course Cards */
+    .course-card {
+      border-top: 6px solid #3498db;
+      border-left: 2px solid #cbd5e1;
+      border-right: 2px solid #cbd5e1;
+      border-bottom: 2px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .progress-container {
+      background: #e2e8f0;
+      border-radius: 4px;
+      height: 8px;
+      width: 100%;
+      margin: 10px 0;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+    }
+    .progress-bar {
+      background: #2ecc71;
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Standard Tables & Lists */
+    .liste {
+      list-style: none;
+    }
+    .liste li {
+      padding: 10px 0;
+      border-bottom: 2px solid #edf2f7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .liste li:last-child {
+      border-bottom: none;
+    }
+
+    /* Aufgaben-Manager (Keine Verschiebung beim Abhaken, Explorer Hover & dicke Ränder) */
+    .todo-list-large li {
+      padding: 14px 12px;
+      font-size: 1.05rem;
+      border: 2px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .todo-list-large li:hover {
+      background-color: #eaeded;
+      border-color: #bdc3c7;
+    }
+    .todo-list-large li.selected-row {
+      background-color: #ebf5fb;
+      border-color: #3498db;
+    }
+    .todo-list-large .delete-btn {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .todo-list-large li:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .todo-item {
+      transition: opacity 0.3s ease; /* Keine Verschiebung/Transform mehr */
+    }
+    .todo-item.completed {
+      opacity: 0.5;
+    }
+    .todo-text {
+      transition: all 0.3s ease;
+    }
+    .todo-item.completed .todo-text {
+      text-decoration: line-through;
+      color: #7f8c8d;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      border: 2px solid #cbd5e1;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    th {
+      background-color: #f8fafc;
+      color: #64748b;
+      border-bottom: 3px solid #64748b;
+    }
+
+    /* Kalender Grid Layout */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      text-align: center;
+    }
+    .calendar-header {
+      font-weight: bold;
+      background: #f1f5f9;
+      padding: 8px;
+      font-size: 0.85rem;
+      color: #475569;
+      border: 2px solid #cbd5e1;
+    }
+    .calendar-day {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      min-height: 85px;
+      padding: 6px;
+      border-radius: 4px;
+      text-align: left;
+      font-size: 0.8rem;
+    }
+    .calendar-day.today {
+      background: #f0fdf4;
+      border-color: #22c55e;
+      border-width: 3px;
+    }
+    .calendar-event {
+      background: #3498db;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 4px;
+      border-radius: 2px;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid #2980b9;
+    }
+
+    /* Form Inputs & Textarea */
+    input[type="text"], input[type="password"], input[type="date"], select, textarea {
+      padding: 8px 12px;
+      border: 2px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 70px;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="view-login">
+  <div class="login-box">
+    <h2>SchoolOrganizer Login</h2>
+    <form id="login-form">
+      <label style="font-size: 0.85rem; color: #555;">Benutzername</label>
+      <input type="text" id="login-user" value="Lukas Huber" required>
+      <label style="font-size: 0.85rem; color: #555;">Passwort</label>
+      <input type="password" id="login-pass" value="******" required>
+      <button type="submit" class="btn" style="width: 100%; margin-top: 5px;">Anmelden</button>
+    </form>
+  </div>
+</div>
+
+<div class="app hidden" id="main-app">
+  <!-- Left Navigation Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">SchoolOrganizer</div>
+      <nav aria-label="Hauptnavigation">
+        <button onclick="app.switchView('dashboard')" id="nav-dashboard" class="aktiv">Dashboard</button>
+        <button onclick="app.switchView('timetable')" id="nav-timetable">WebUntis</button>
+        <button onclick="app.switchView('courses')" id="nav-courses">Moodle Kurse</button>
+        <button onclick="app.switchView('report')" id="nav-report">Notenspiegel</button>
+        <button onclick="app.switchView('calendar')" id="nav-calendar">Kalender</button>
+        <button onclick="app.switchView('todos')" id="nav-todos">Aufgaben</button>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        Angemeldet als<br>
+        <strong id="display-username">Lukas Huber</strong><br>
+        Klasse: HTL 3AHWII
+      </div>
+      <button class="settings-btn" onclick="app.openSettings()" title="Einstellungen">
+        ⚙
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Panel -->
+  <main>
+    
+    <!-- VIEW 1: DASHBOARD OVERVIEW -->
+    <div id="view-dashboard">
+      <div class="kopf">
+        <h1>Dashboard</h1>
+        <button onclick="app.switchView('todos')" class="btn">Neue Aufgabe</button>
+      </div>
+
+      <!-- 4er Grid Widgets -->
+      <div class="grid vier">
+        <div class="card">
+          <h2>Nächste Stunde</h2>
+          <p style="font-weight: bold; margin-top: 5px;">POS1 (Software Eng.)</p>
+          <p style="margin-top: 5px;"><span class="badge status-supplierung">EDV-3 (Supplierung)</span></p>
+        </div>
+        <div class="card">
+          <h2>Fällige Aufgaben</h2>
+          <p class="punkte" id="dash-pending-count">0</p>
+        </div>
+        <div class="card">
+          <h2>Notenschnitt</h2>
+          <p class="punkte">1.43</p>
+          <p style="margin-top: 5px;"><span class="badge" style="background:#d1e7dd; color:#0f5132;">Ausgezeichneter Erfolg</span></p>
+        </div>
+        <div class="card">
+          <h2>Anwesenheit</h2>
+          <p class="punkte" style="color: #27ae60;">98.2%</p>
+          <p style="font-size: 0.75rem; color: #7f8c8d; margin-top: 5px;">0 Unentschuldigt</p>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid (Stundenplan entfernt, Aufgabenleiste horizontal gestreckt) -->
+      <div class="grid eins" style="grid-template-columns: 1fr;">
+        <section class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2>Aktuelle Aufgaben (Übersicht)</h2>
+            <button onclick="app.switchView('todos')" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Alle verwalten</button>
+          </div>
+          <ul class="liste todo-list-large" id="dash-todo-list">
+            <!-- Populated via JS -->
+          </ul>
+        </section>
+      </div>
+
+      <!-- Weitere Dashboard Widgets -->
+      <div class="grid zwei">
+        <section class="card">
+          <h2>Anstehende Moodle Deadlines</h2>
+          <ul class="liste">
+            <li>
+              <span><strong>POS1:</strong> C# Polymorphie Übung</span>
+              <span class="badge" style="background: #f8d7da; color: #842029;">Heute, 23:59</span>
+            </li>
+            <li>
+              <span><strong>AM:</strong> Integralrechnung SA-Vorbereitung</span>
+              <span class="badge" style="background: #fff3cd; color: #664d03;">Morgen, 18:00</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Schnellnotizen</h2>
+          <textarea id="quick-notes" placeholder="Kurze Notizen hier eingeben..." oninput="localStorage.setItem('schorg_notes', this.value)"></textarea>
+        </section>
+      </div>
+    </div>
+
+    <!-- VIEW 2: UNTIS TIMETABLE -->
+    <div id="view-timetable" class="hidden">
+      <div class="kopf">
+        <h1>WebUntis Stundenplan</h1>
+        <div>
+          <button onclick="app.changeWeek(-1)" class="btn btn-secondary">&laquo;</button>
+          <span style="font-weight: bold; margin: 0 10px;" id="timetable-week-label">Woche 46 (10.11. - 14.11.2026)</span>
+          <button onclick="app.changeWeek(1)" class="btn btn-secondary">&raquo;</button>
+        </div>
+      </div>
+
+      <!-- Farblegende für WebUntis -->
+      <div class="untis-legend card" style="padding: 10px 15px; margin-bottom: 15px;">
+        <div class="legend-item"><div class="legend-box" style="background: #e9ecef; border: 1px solid #ced4da;"></div><span>Normaler Unterricht</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: #fff3cd; border: 1px solid #ffc107;"></div><span>Supplierung / Raumwechsel</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: #f3e8ff; border: 1px solid #a855f7;"></div><span>Schularbeit / Test</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: #f8d7da; border: 1px solid #dc3545;"></div><span>Entfall</span></div>
+      </div>
+
+      <div class="card">
+        <table class="timetable-table">
+          <thead>
+            <tr>
+              <th>Stunde</th>
+              <th>Mo 10.11.</th>
+              <th>Di 11.11.</th>
+              <th>Mi 12.11.</th>
+              <th>Do 13.11.</th>
+              <th>Fr 14.11.</th>
+            </tr>
+          </thead>
+          <tbody id="timetable-grid-body">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIEW 3: MOODLE COURSES -->
+    <div id="view-courses" class="hidden">
+      <div class="kopf">
+        <h1>Moodle Kurse & Fachaufgaben</h1>
+      </div>
+
+      <div class="grid drei" id="courses-full-grid">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+
+    <!-- VIEW 4: NOTENSPIEGEL -->
+    <div id="view-report" class="hidden">
+      <div class="kopf">
+        <h1>Jahreszeugnis / Notenspiegel</h1>
+        <div id="report-status-badge">
+          <span class="badge" style="background:#d1e7dd; color:#0f5132;" id="report-result-text">Mit ausgezeichnetem Erfolg</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Gegenstand</th>
+              <th>Lehrkraft</th>
+              <th>1. SA</th>
+              <th>2. SA</th>
+              <th>Mitarbeit</th>
+              <th>Semesternote</th>
+            </tr>
+          </thead>
+          <tbody id="report-table-body">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIEW 5: KALENDER -->
+    <div id="view-calendar" class="hidden">
+      <div class="kopf">
+        <h1>Schulkalender & Termine</h1>
+        <div>
+          <button onclick="app.openEventModal()" class="btn">Termin hinzufügen</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: 15px;">November 2026</h3>
+        <div class="calendar-grid">
+          <div class="calendar-header">Mo</div>
+          <div class="calendar-header">Di</div>
+          <div class="calendar-header">Mi</div>
+          <div class="calendar-header">Do</div>
+          <div class="calendar-header">Fr</div>
+          <div class="calendar-header">Sa</div>
+          <div class="calendar-header">So</div>
+          
+          <div class="calendar-day" style="opacity: 0.4;">26</div>
+          <div class="calendar-day" style="opacity: 0.4;">27</div>
+          <div class="calendar-day" style="opacity: 0.4;">28</div>
+          <div class="calendar-day" style="opacity: 0.4;">29</div>
+          <div class="calendar-day" style="opacity: 0.4;">30</div>
+          <div class="calendar-day" style="opacity: 0.4;">31</div>
+          
+          <div class="calendar-day">1</div>
+          <div class="calendar-day">2</div>
+          <div class="calendar-day">3</div>
+          <div class="calendar-day">4</div>
+          <div class="calendar-day">5</div>
+          <div class="calendar-day">6</div>
+          <div class="calendar-day">7</div>
+          <div class="calendar-day">8</div>
+          <div class="calendar-day">9</div>
+          <div class="calendar-day today">10<div class="calendar-event">POS Projektstart</div></div>
+          <div class="calendar-day">11<div class="calendar-event" style="background:#e74c3c;">AM Test</div></div>
+          <div class="calendar-day">12</div>
+          <div class="calendar-day">13<div class="calendar-event" style="background:#a855f7;">Englisch SA</div></div>
+          <div class="calendar-day">14</div>
+          <div class="calendar-day">15</div>
+          <div class="calendar-day">16</div>
+          <div class="calendar-day">17</div>
+          <div class="calendar-day">18</div>
+          <div class="calendar-day">19</div>
+          <div class="calendar-day">20</div>
+          <div class="calendar-day">21</div>
+          <div class="calendar-day">22</div>
+          <div class="calendar-day">23</div>
+          <div class="calendar-day">24</div>
+          <div class="calendar-day">25</div>
+          <div class="calendar-day">26</div>
+          <div class="calendar-day">27</div>
+          <div class="calendar-day">28</div>
+          <div class="calendar-day">29</div>
+          <div class="calendar-day">30</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: TASK MANAGER -->
+    <div id="view-todos" class="hidden">
+      <div class="kopf">
+        <h1>Aufgabenverwaltung</h1>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="app.completeSelectedTodos()" class="btn btn-secondary">Ausgewählte erledigen</button>
+          <button onclick="app.deleteSelectedTodos()" class="btn btn-danger">Ausgewählte löschen</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 22px;">
+        <form id="full-todo-form" style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <input type="text" id="full-todo-title" placeholder="Neue Aufgabe..." required style="flex: 1; min-width: 220px; font-size: 1rem; padding: 10px 14px;">
+          <select id="full-todo-course" style="font-size: 1rem; padding: 10px 14px;">
+            <option value="POS1">POS1</option>
+            <option value="AM">AM</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="WIR">WIR</option>
+            <option value="Sonstige">Sonstige</option>
+          </select>
+          <select id="full-todo-priority" style="font-size: 1rem; padding: 10px 14px;">
+            <option value="Hoch">Hoch</option>
+            <option value="Mittel" selected>Mittel</option>
+            <option value="Niedrig">Niedrig</option>
+          </select>
+          <button type="submit" class="btn" style="font-size: 1rem; padding: 10px 18px;">Hinzufügen</button>
+        </form>
+      </div>
+
+      <div class="card" style="padding: 22px;">
+        <div style="margin-bottom: 15px; font-size: 0.95rem;">
+          <label><input type="checkbox" id="select-all" onclick="app.toggleSelectAll(this)" style="transform: scale(1.2); margin-right: 8px;"> Alle auswählen</label>
+        </div>
+        <ul class="liste todo-list-large" id="full-todo-list-container">
+          <!-- Populated via JS -->
+        </ul>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Objektorientierte Klassen-Architektur für saubere Struktur
+  class TaskManager {
+    constructor() {
+      this.todos = [
+        { id: 1, title: 'POS Abgabe C# Polymorphie Übung', course: 'POS1', priority: 'Hoch', completed: false, selected: false },
+        { id: 2, title: 'AM Beispiele Integralrechnung S. 142', course: 'AM', priority: 'Hoch', completed: false, selected: false },
+        { id: 3, title: 'D Textanalyse Kafka vorbereiten', course: 'D', priority: 'Mittel', completed: true, selected: false }
+      ];
+    }
+
+    add(title, course, priority) {
+      this.todos.push({ id: Date.now(), title, course, priority, completed: false, selected: false });
+    }
+
+    toggleState(id) {
+      const todo = this.todos.find(t => t.id === id);
+      if (todo) todo.completed = !todo.completed;
+    }
+
+    toggleSelect(id) {
+      const todo = this.todos.find(t => t.id === id);
+      if (todo) todo.selected = !todo.selected;
+    }
+
+    selectAll(status) {
+      this.todos.forEach(t => t.selected = status);
+    }
+
+    completeSelected() {
+      this.todos.forEach(t => {
+        if (t.selected) {
+          t.completed = true;
+          t.selected = false;
+        }
+      });
+    }
+
+    deleteSelected() {
+      this.todos = this.todos.filter(t => !t.selected);
+    }
+
+    deleteOne(id) {
+      this.todos = this.todos.filter(t => t.id !== id);
+    }
+
+    getSorted() {
+      const pWeight = { 'Hoch': 1, 'Mittel': 2, 'Niedrig': 3 };
+      return [...this.todos].sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed - b.completed;
+        return (pWeight[a.priority] || 2) - (pWeight[b.priority] || 2);
+      });
+    }
+
+    getPendingCount() {
+      return this.todos.filter(t => !t.completed).length;
+    }
+  }
+
+  class TimetableManager {
+    constructor() {
+      this.weekOffset = 0;
+      this.data = [
+        {
+          period: "1. (08:00)",
+          mon: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "regular" },
+          tue: { subject: "AM", room: "Klasse 3A", teacher: "Dr. Steiner", status: "regular" },
+          wed: { subject: "D", room: "Klasse 3A", teacher: "Mag. Bauer", status: "regular" },
+          thu: { subject: "E", room: "Sprachraum", teacher: "Prof. Miller", status: "schularbeit" },
+          fri: { subject: "NW", room: "Physik-Saal", teacher: "Dr. Curie", status: "regular" }
+        },
+        {
+          period: "2. (08:50)",
+          mon: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "regular" },
+          tue: { subject: "POS", room: "EDV-3", teacher: "Prof. Gruber", status: "supplierung" },
+          wed: { subject: "D", room: "Klasse 3A", teacher: "Mag. Bauer", status: "regular" },
+          thu: { subject: "E", room: "Sprachraum", teacher: "Prof. Miller", status: "regular" },
+          fri: { subject: "WIR", room: "Klasse 3A", teacher: "Mag. Wallner", status: "regular" }
+        },
+        {
+          period: "3. (09:55)",
+          mon: { subject: "WIR", room: "Klasse 3A", teacher: "Mag. Wallner", status: "regular" },
+          tue: { subject: "KS", room: "CAD-Labor", teacher: "Ing. Hofer", status: "regular" },
+          wed: { subject: "AM", room: "Klasse 3A", teacher: "Dr. Steiner", status: "regular" },
+          thu: { subject: "KS", room: "CAD-Labor", teacher: "Ing. Hofer", status: "regular" },
+          fri: { subject: "POS", room: "EDV-1", teacher: "Prof. Gruber", status: "entfall" }
+        }
+      ];
+    }
+
+    changeWeek(offset) {
+      this.weekOffset += offset;
+      return 46 + this.weekOffset;
+    }
+  }
+
+  class SchoolOrganizerApp {
+    constructor() {
+      this.taskManager = new TaskManager();
+      this.timetableManager = new TimetableManager();
+      this.currentView = 'dashboard';
+
+      this.coursesData = [
+        { code: 'POS1', title: 'Programmieren & Software Eng.', instructor: 'Prof. Gruber', color: '#3730a3' },
+        { code: 'AM', title: 'Angewandte Mathematik', instructor: 'Dr. Steiner', color: '#055160' },
+        { code: 'D', title: 'Deutsch & Kommunikation', instructor: 'Mag. Bauer', color: '#842029' },
+        { code: 'E', title: 'Englisch', instructor: 'Prof. Miller', color: '#b45309' },
+        { code: 'WIR', title: 'Wirtschaft & Recht', instructor: 'Mag. Wallner', color: '#0f5132' }
+      ];
+
+      this.reportGradesData = [
+        { subject: "POS", title: "POS1", teacher: "Prof. Gruber", sa1: 1, sa2: 1, mitarbeit: 1, final: 1 },
+        { subject: "AM", title: "AM", teacher: "Dr. Steiner", sa1: 2, sa2: 1, mitarbeit: "2", final: 1 },
+        { subject: "D", title: "D", teacher: "Mag. Bauer", sa1: 1, sa2: 2, mitarbeit: 1, final: 1 },
+        { subject: "E", title: "E", teacher: "Prof. Miller", sa1: 2, sa2: 2, mitarbeit: 2, final: 2 },
+        { subject: "WIR", title: "WIR", teacher: "Mag. Wallner", sa1: 1, sa2: 1, mitarbeit: 1, final: 1 },
+        { subject: "NW", title: "NW", teacher: "Dr. Curie", sa1: 3, sa2: 3, mitarbeit: 3, final: 3 },
+        { subject: "KS", title: "KS", teacher: "Ing. Hofer", sa1: 4, sa2: 4, mitarbeit: 3, final: 4 }
+      ];
+
+      this.initEvents();
+    }
+
+    initEvents() {
+      document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('login-user').value;
+        if (username) {
+          document.getElementById('display-username').textContent = username;
+        }
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        this.initDashboardData();
+      });
+
+      document.getElementById('full-todo-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('full-todo-title').value.trim();
+        const course = document.getElementById('full-todo-course').value;
+        const priority = document.getElementById('full-todo-priority').value;
+        if (title) {
+          this.taskManager.add(title, course, priority);
+          document.getElementById('full-todo-title').value = '';
+          this.renderAll();
+        }
+      });
+    }
+
+    initDashboardData() {
+      const options = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+      const dateEl = document.getElementById('dash-date');
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString('de-AT', options);
+
+      const savedNotes = localStorage.getItem('schorg_notes');
+      if (savedNotes) {
+        const notesEl = document.getElementById('quick-notes');
+        if (notesEl) notesEl.value = savedNotes;
+      }
+
+      this.renderAll();
+    }
+
+    switchView(viewName) {
+      this.currentView = viewName;
+      document.querySelectorAll('.sidebar nav button').forEach(btn => btn.classList.remove('aktiv'));
+      const activeNav = document.getElementById(`nav-${viewName}`);
+      if (activeNav) activeNav.classList.add('aktiv');
+
+      ['dashboard', 'timetable', 'courses', 'report', 'calendar', 'todos'].forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) {
+          if (v === viewName) el.classList.remove('hidden');
+          else el.classList.add('hidden');
+        }
+      });
+    }
+
+    renderAll() {
+      this.renderDashboard();
+      this.renderTimetable();
+      this.renderCourses();
+      this.renderReportCard();
+      this.renderTodos();
+    }
+
+    renderDashboard() {
+      const dashList = document.getElementById('dash-todo-list');
+      if (!dashList) return;
+      dashList.innerHTML = '';
+      
+      const pendingCountEl = document.getElementById('dash-pending-count');
+      if (pendingCountEl) pendingCountEl.textContent = this.taskManager.getPendingCount();
+
+      this.taskManager.getSorted().slice(0, 6).forEach(todo => {
+        let prioClass = 'prio-mittel';
+        if (todo.priority === 'Hoch') prioClass = 'prio-hoch';
+        if (todo.priority === 'Niedrig') prioClass = 'prio-niedrig';
+
+        const li = document.createElement('li');
+        li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+        li.innerHTML = `
+          <span style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="app.toggleTodoState(${todo.id})" style="transform: scale(1.3); cursor: pointer;">
+            <span class="todo-text">${todo.title}</span>
+          </span>
+          <span class="badge ${prioClass}">${todo.course}</span>
+        `;
+        dashList.appendChild(li);
+      });
+    }
+
+    renderTimetable() {
+      const tbody = document.getElementById('timetable-grid-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      this.timetableManager.data.forEach(row => {
+        const tr = document.createElement('tr');
+        let html = `<td><strong>${row.period}</strong></td>`;
+        ['mon', 'tue', 'wed', 'thu', 'fri'].forEach(day => {
+          const cell = row[day];
+          let cellClass = 'untis-normal';
+          if (cell.status === 'supplierung') cellClass = 'status-supplierung';
+          if (cell.status === 'entfall') cellClass = 'status-entfall';
+          if (cell.status === 'schularbeit') cellClass = 'status-schularbeit';
+
+          html += `<td><div class="${cellClass}"><strong>${cell.subject}</strong><br><small>${cell.room} | ${cell.teacher}</small></div></td>`;
+        });
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      });
+    }
+
+    changeWeek(offset) {
+      const weekNum = this.timetableManager.changeWeek(offset);
+      const label = document.getElementById('timetable-week-label');
+      if (label) label.textContent = `Woche ${weekNum}`;
+    }
+
+    renderCourses() {
+      const container = document.getElementById('courses-full-grid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      this.coursesData.forEach(course => {
+        const courseTasks = this.taskManager.todos.filter(t => t.course === course.code);
+        const completedTasks = courseTasks.filter(t => t.completed).length;
+        const totalTasks = courseTasks.length;
+        const progressPercent = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        const card = document.createElement('div');
+        card.className = 'card course-card';
+        card.style.borderTopColor = course.color;
+
+        let tasksHtml = courseTasks.length === 0 ? '<p style="font-size: 0.8rem; color: #7f8c8d;">Keine Aufgaben zugeordnet.</p>' : '<ul class="liste" style="font-size: 0.85rem;">';
+        
+        const pWeight = { 'Hoch': 1, 'Mittel': 2, 'Niedrig': 3 };
+        const sortedCourseTasks = [...courseTasks].sort((a, b) => (pWeight[a.priority] || 2) - (pWeight[b.priority] || 2));
+
+        sortedCourseTasks.forEach(t => {
+          let prioClass = 'prio-mittel';
+          if (t.priority === 'Hoch') prioClass = 'prio-hoch';
+          if (t.priority === 'Niedrig') prioClass = 'prio-niedrig';
+
+          tasksHtml += `
+            <li style="padding: 5px 0;">
+              <span style="${t.completed ? 'text-decoration: line-through; color: #888;' : ''}">${t.title}</span>
+              <span class="badge ${prioClass}">${t.priority}</span>
+            </li>
+          `;
+        });
+        if(courseTasks.length > 0) tasksHtml += '</ul>';
+
+        card.innerHTML = `
+          <div>
+            <h2 style="color: ${course.color};">${course.code}</h2>
+            <p><strong>${course.title}</strong></p>
+            <p><small>${course.instructor}</small></p>
+            <div style="margin-top: 15px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #7f8c8d;">
+                <span>Fortschritt</span>
+                <span>${completedTasks} / ${totalTasks} erledigt</span>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <p style="font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: #2c3e50;">Aufgaben für dieses Fach:</p>
+              ${tasksHtml}
+            </div>
+          </div>
+          <button onclick="alert('Öffne Moodle Kurs ${course.code}')" class="btn" style="margin-top: 15px; background-color: ${course.color}; border-color: ${course.color};">Moodle öffnen</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    renderReportCard() {
+      const tbody = document.getElementById('report-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      this.reportGradesData.forEach(item => {
+        const tr = document.createElement('tr');
+        // Farben der Fächer beim Notenspiegel entfernt (laut Anweisung)
+        tr.innerHTML = `
+          <td><strong>${item.title}</strong></td>
+          <td>${item.teacher}</td>
+          <td><span class="grade-badge grade-${item.sa1}">${item.sa1}</span></td>
+          <td><span class="grade-badge grade-${item.sa2}">${item.sa2}</span></td>
+          <td><span class="grade-badge grade-${item.mitarbeit}">${item.mitarbeit}</span></td>
+          <td><span class="grade-badge grade-${item.final}">${item.final}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderTodos() {
+      const container = document.getElementById('full-todo-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      this.taskManager.getSorted().forEach(todo => {
+        let prioClass = 'prio-mittel';
+        if (todo.priority === 'Hoch') prioClass = 'prio-hoch';
+        if (todo.priority === 'Niedrig') prioClass = 'prio-niedrig';
+
+        const li = document.createElement('li');
+        li.className = `todo-item ${todo.completed ? 'completed' : ''} ${todo.selected ? 'selected-row' : ''}`;
+        li.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+            this.toggleSelectTodo(todo.id);
+          }
+        };
+
+        li.innerHTML = `
+          <span style="display: flex; align-items: center; gap: 14px;">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="app.toggleTodoState(${todo.id})" style="transform: scale(1.4); cursor: pointer;">
+            <span class="todo-text">${todo.title}</span>
+            <span class="badge ${prioClass}">${todo.priority}</span>
+            <span class="badge">${todo.course}</span>
+          </span>
+          <button onclick="app.deleteTodo(${todo.id})" class="btn btn-secondary delete-btn" style="padding: 4px 10px;">✕</button>
+        `;
+        container.appendChild(li);
+      });
+    }
+
+    toggleTodoState(id) {
+      this.taskManager.toggleState(id);
+      this.renderDashboard();
+      this.renderCourses();
+      this.renderTodos();
+    }
+
+    toggleSelectTodo(id) {
+      this.taskManager.toggleSelect(id);
+      this.renderTodos();
+    }
+
+    toggleSelectAll(master) {
+      this.taskManager.selectAll(master.checked);
+      this.renderTodos();
+    }
+
+    completeSelectedTodos() {
+      this.taskManager.completeSelected();
+      const selectAllEl = document.getElementById('select-all');
+      if (selectAllEl) selectAllEl.checked = false;
+      this.renderDashboard();
+      this.renderCourses();
+      this.renderTodos();
+    }
+
+    deleteSelectedTodos() {
+      this.taskManager.deleteSelected();
+      const selectAllEl = document.getElementById('select-all');
+      if (selectAllEl) selectAllEl.checked = false;
+      this.renderDashboard();
+      this.renderCourses();
+      this.renderTodos();
+    }
+
+    deleteTodo(id) {
+      this.taskManager.deleteOne(id);
+      this.renderDashboard();
+      this.renderCourses();
+      this.renderTodos();
+    }
+
+    openEventModal() {
+      const title = prompt("Neuen Kalendertermin eingeben:");
+      if (title) {
+        alert(`Termin "${title}" wurde erfolgreich eingetragen!`);
+      }
+    }
+
+    openSettings() {
+      alert("Benutzereinstellungen geöffnet.");
+    }
+  }
+
+  // App-Instanz starten
+  const app = new SchoolOrganizerApp();
+</script>
+
+</body>
+</html>
